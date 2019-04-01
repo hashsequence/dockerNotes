@@ -217,3 +217,93 @@ $sudo docker container stats mysql
 --gives me details on running container
 
 ++27 Getting a Shell Inside Containers++
+
+docker container run -it
+--start new container interactively
+docker container exec -it
+--run additional command in existing container
+
+$ sudo docker container run -it --name proxy nginx bash
+--run bash on nginx container
+--exit to exit out
+
+$ sudo docker container run -it --name ubuntu ubuntu
+--run ubuntu container
+
+
+++28 Docker Networks: Concepts for Private and Public Comms
+docker container run -p
+--for local dev/testing, network usually "just work"
+--quick port check with docker container port <container>
+--understand how dockers talk to each other
+--each container connected to private virtual network "bridge"
+--all containers on a virt net can talk to each other without -p
+--best practice is to create a new virt net for each App
+--make new virtual networks
+
+  unless I specify the -p no networks coming to my newtwork is actually
+  getting into my container
+
+  lets say we have a mysql container without -p
+  and we have a httpd with -p 8080:80
+
+  as soon as traffic comes into 8080 it will route into httpd,
+  the httpd is free to talk to the mysql container via listening port
+
+--you cant have more than one container listening on same port
+
+++29 FIXME: nginx removes ping++
+
+Anywhere I do a docker container run <stuff> nginx , where nginx
+ is the image you should use, replace that with nginx:alpine ,
+  which still has ping command in it.
+
+++Docker Networks: CLI Management of virtual Networks
+docker network ls
+--show Networks
+docker network inspect
+--inspect a network
+docker network create --driver
+--create network
+docker network connect
+--attach a network to container
+docker network disconnect
+--detach a network from container
+
+avwong13@avwong13:~/dockerNotes$ sudo docker network create my_app_net
+43ff195809b0a76ca326c7581b91f76d0fff4d0a4611caf309adc1ebb4f98b13
+avwong13@avwong13:~/dockerNotes$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+1b7f0aad50a8        bridge              bridge              local
+e0c703b821cd        host                host                local
+43ff195809b0        my_app_net          bridge              local
+bd6a5a434f32        none                null                local
+
+--run this below to start container in your new network:
+$ sudo docker container run -d --name new_nginx --network my_app_net nginx
+2109f3c42a36673d6ea2dc58bc1e484e485e42bab0213a7b88a5fad461351cb4
+
+
+connect my_app_net to the webhost:
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                 NAMES
+2109f3c42a36        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   80/tcp                new_nginx
+e28a17ea86a1        nginx               "nginx -g 'daemon of…"   17 minutes ago       Up 17 minutes       0.0.0.0:80->80/tcp    webhost
+5e56ba83a0a4        mysql               "docker-entrypoint.s…"   6 hours ago          Up 6 hours          3306/tcp, 33060/tcp   mysql
+a089cae98cce        nginx               "nginx -g 'daemon of…"   6 hours ago          Up 6 hours          80/tcp                nginx
+avwong13@avwong13:~/dockerNotes$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+1b7f0aad50a8        bridge              bridge              local
+e0c703b821cd        host                host                local
+43ff195809b0        my_app_net          bridge              local
+bd6a5a434f32        none                null                local
+avwong13@avwong13:~/dockerNotes$  docker network connect 43ff195 e28a17
+
+--now inspect webhost and go to Networks properties to see its connected to two
+sudo docker container inspect e28a17
+
+--disconnecting:
+$ sudo docker network disconnect 43ff195 e28a17
+avwong13@avwong13:~/dockerNotes$ sudo docker container inspect e28a17
+
+++31 Docker Networks: DNS and how containers find each other++
