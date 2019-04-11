@@ -1,0 +1,189 @@
+I currently work with developing data pipelines to for enterprise software
+that deals with large scale printing. Basically our pipelines takes data provided
+by clients, and we process them and we produce pdf images as per our clients needs
+and we physically print them and ship them out. My job mostly requires the use of
+MSSQL and C# for our data processing needs, but I was given the freedom
+to work on some internal projects and automation that lets me explore different
+technologies, in which I mostly use Go.
+
+I've did some research on your product. So basically you guys have platform
+that allows SaaS companies to move their cloud applications to on premise.
+This allows your customers to spend more tine on developing their products instead
+on focusing on administrative stuff like packaging their software and make sure
+its up an running for their customers.
+Base on my understanding replicated achieves this using container technologies and
+infrastructure software for your platform.
+
+I saw that the job requirements require
+Golang
+Javascript
+Docker
+Kubernetes
+Terraform
+
+For golang I have build simple command line tools and I created a simple restful api
+with Go,
+
+I've used javascript in some side projects like building small applications with node
+and I have used React to build my prototypal personal website which I deployed to heroku
+
+Although I have no expierience docker I've spent the weekend learning docker
+via an undemy course
+
+I did some simple research on kubernetes.
+Basically from my understanding kubernetes you have this kubernetes cluster services
+and you have building blocks called workers, which are container hosts, which has this
+kubletes process which communicates with the kubernetes cluster.
+WE have a desired state management which is in the YAML files with all the configuration
+this deployment file has pods which is the smallest unit of deployment. In a
+pod we have some number of runnning containers
+also specifies what tcp port and what other services
+the cluster services have to figure out how to schedule these pods to run
+on our workers, if for example one pod goes down, the cluster make sure that the
+running configuration must be fixed and so it picks another worker to run the other
+pod that was run in the down workers
+
+
+what is terraform:
+it was develop by hashicorp and basically it allows us to define a data
+center infrastructure in a very high level config language, which in this case
+is the hashicorp configuration language.
+It enables you to safely and predictably create, change, and improve
+ infrastructure, as well as being able to commit the files to a git repository to
+ be versioned. It is an open source tool that codifies APIs into declarative configuration files (*.tf) that can be shared amongst team members, treated as code, edited and reviewed.
+
+It basically creates infrastructure following a config file.
+You can think of it as the “Docker for cloud services“. But instead of a Dockerfile, you have a http://main.tf.
+Research on Replicated:
+
+Would you rather spend time developing your app’s features, or doing black-box
+systems administration for your enterprise customers
+
+Replicated freed our team to focus on the needs of our customers
+instead of the diverting resources for an on-prem version. Without their
+product and excellent support, we wouldn't
+have achieved the maturity and stability of our Enterprise product
+nearly as fast."
+
+took care of a lot of the orchestration pain,
+
+"This is so clearly the future of Enterprise software, it really shouldn't
+ matter where an application is deployed anymore."
+
+ "We built Terraform. We built Packer. We built all of these tools that
+ theoretically you glue together and you get an on-prem installer. Turns out
+  there is a lot more to it."
+
+"We decided to give it a shot and see how fast we could get up and running.
+It’s great; you just provide Replicated with a Dockerized version of your app
+and they provide the features that make it an enterprise-ready, installable
+application."
+
+replicated buisiness info
+--series A startup founded by grant miller and marc campbell in 2014
+
+questions:
+--how do you guys generate revunue
+--I see on crunchbase that the last round of funding was in oct 31 2016,
+is replicated, long is replicated runway
+--how do you guys measure your product's current traction
+--How fast is the expected growth of replicated in terms of revenue and headcount
+--do you guys see any competitors to replicated's products
+Replicate ship project
+--what are the current priorities and goals right now
+
+How Replicated Ship Works
+Replicated Ship enables Kubernetes cluster operators to deploy both
+Open Source Software (OSS) and Commercial Off The Shelf (COTS)
+software (externally-developed software) in a whole new way.
+This new approach is based on a few foundational concepts that
+change what is possible.
+
+reducing operation overhead when deploying ots software to Kubernetes
+
+for ots software you need to write the config (application and runtime)
+app : application keys
+runtime : replica counts
+
+runtime config is not finite
+
+we use helm charts to deploy to kubernetes
+not a great way to operationalize an application
+
+you cannot get into the runtime config of kubernetes
+
+people then copy or fork the helm chart
+make the changes to helm charts
+
+you can only do aythinf the helm chart author originally wrote
+
+long live forks are bad because you need to manually reconcile them
+how do we get them upstreams, e veryone doe pull requests upstream
+
+you can you kustomize to periodically rebase application,
+so no longer need to fork
+
+
+from my understanding ship streamlines the software development life cycle
+I took at powerpoints provided on the replicated website.
+
+Without ship the SDLC would be
+a dev writes or updates a configuration
+dev then makes a git or pull request
+then theres the code/yaml review
+merge request
+automated continuous intergration
+(Continuous Integration (CI) is a development practice
+that requires developers to integrate code into a shared
+repository several times a day. Each check-in is then verified
+by an automated build, allowing teams to detect problems early.)
+
+with replicated
+upstream releases a new version
+ship detects updates and merges new base with patches
+ship then makes a git pull request
+
+Helm uses a packaging format called charts. A chart is a collection of files
+that describe a related set of Kubernetes resources. A single chart might be used
+ to deploy something simple, like a memcached pod, or something complex, like a
+ full web app stack with HTTP servers, databases, caches, and so on.
+
+Charts are created as files laid out in a particular directory tree, then they
+can be packaged into versioned archives to be deployed.
+
+how do people deploy to kubernetes today, they use templates
+helm charts is the most popular way for OTS application deployment, but
+helm charts are not customizable to work in many environments
+helm only allows configuration of items in the chart, not additions or deletions
+or non-standard changes
+realistically what people do is fork or clone the helm chart
+and make the changes
+if many people do the same thing, leading to long live forks
+with Ship
+you no longer need to fork Charts
+its helm compatible
+offers custom configuration
+pluggable into existing workflows
+more than just install
+automates mergin upstream
+
+with ship the main selling point is that
+the user can periodically rebase their base,
+this is a git merge conflict free process,
+
+ship has three modes
+ship init - the manual process, the initial configuration
+
+ship watch
+--check for upstream updates
+
+ship updates
+--pull and merge upstream updates
+
+basically no patch dont fork
+
+need to understand the importance of docker  to understand kubernetes
+need to know kubernetes
+to understand the importance of helm charts
+
+there are three versions of ship (enables, open source, enterprise)
