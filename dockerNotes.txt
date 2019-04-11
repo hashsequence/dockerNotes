@@ -307,3 +307,204 @@ $ sudo docker network disconnect 43ff195 e28a17
 avwong13@avwong13:~/dockerNotes$ sudo docker container inspect e28a17
 
 ++31 Docker Networks: DNS and how containers find each other++
+
+for get static ip's as a way for containers to see each other, because
+its too dynamic
+
+Docker has DNS naming
+
+Detached mode, shown by the option --detach or -d, means that a Docker container
+runs in the background of your terminal.
+
+
+-my_nginx pinging new_nginx
+sudo docker container run -it -d --name new_nginx --network my_app_net nginx:alpine
+3fc886d83c50199cb53a4397016317e55bf16e797e1157f24051dcac36f89851
+avwong13@avwong13:~/dockerNotes$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
+3fc886d83c50        nginx:alpine        "nginx -g 'daemon of…"   About a minute ago   Up About a minute   80/tcp               new_nginx
+b80070fdd01b        nginx:alpine        "nginx -g 'daemon of…"   7 minutes ago        Up 7 minutes        80/tcp               my_nginx
+4d460300cfa1        nginx               "nginx -g 'daemon of…"   20 minutes ago       Up 20 minutes       0.0.0.0:80->80/tcp   webhost
+avwong13@avwong13:~/dockerNotes$ sudo docker container exec -it new_nginx ping my_nginx
+PING my_nginx (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.394 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.220 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.217 ms
+64 bytes from 172.18.0.2: seq=3 ttl=64 time=0.185 ms
+64 bytes from 172.18.0.2: seq=4 ttl=64 time=0.243 ms
+64 bytes from 172.18.0.2: seq=5 ttl=64 time=0.235 ms
+64 bytes from 172.18.0.2: seq=6 ttl=64 time=0.216 ms
+^C
+--- my_nginx ping statistics ---
+7 packets transmitted, 7 packets received, 0% packet loss
+round-trip min/avg/max = 0.185/0.244/0.394 ms
+
+hostname will always be the same
+
+--link defines link between containers
+compose will automatically spin up virtual network
+
+++32 Assignment: Using Containers for CLI Testing++
+
+use different linux distro containers to check curl cli tool version
+
+use two different terminal windows to start bash in centos:7 and ubuntu:14.04 using
+-it
+
+ensure curl is up to date on both distro
+ubuntu : apt-get update && apt-get install curl
+centos:yum update curls
+
+check curl --version
+
+-ubuntu
+$ sudo docker container run -it -d --name ubuntu ubuntu:14.04
+$ sudo docker container exec -it ubuntu bash
+root@04601d7640c4:/# apt-get update && apt-get install curl
+
+-centos
+$ sudo docker container run -it -d --name centos centos:7
+$ sudo docker container exec -it centos bash
+[root@7fae1027116f /]# yum update curls
+
+++34 Assignment: DNS Round Robin Test++
+
+Know how to use -it to get shell in container
+know how to run a container
+under stand basics of dns
+
+DNS round robin test is two different hosts with dns alias
+that responds to the same dns name, for example google.com
+we have multiple dns records
+
+create a virtual network (default bridege driver)
+create two contaienrs from elasticsearch:2
+use --network-alias search when creating them to give
+them an additional dns name to respond to
+
+run alpine nslookup search with --net to see the two containers list
+for the same DNS name
+
+run centos curl -s search:9200 with --net multiple times until
+you see both "name" fields show
+
+ If instead you’d like Docker to automatically clean up the
+ container and remove the file system when the container exits,
+ you can add the --rm flag:
+
+ $ sudo docker container run -it -d --name el2 --network my_app_net --alias-net search elasticsearch:2
+ $ sudo docker container run -it -d --name el2 --network my_app_net --alias-net search elasticsearch:2
+ $sudo docker container run --rm --net my_app_net  alpine nslookup search
+ alpine nslookup search
+
+nslookup: can't resolve '(null)': Name does not resolve
+Name:      search
+Address 1: 172.18.0.4 el1.my_app_net
+Address 2: 172.18.0.5 el2.my_app_net
+ $ sudo docker container run --net my_app_net centos curl -s search:9200
+
+++36 What's In An Image (and What Isn't)++
+
+whats an image:
+app binaries and dependencies
+metadata about image data nd how to run image
+not a complete OS, no kernel (eg no drivers)
+small as one file like a golang static binary
+big as ubuntu distro with apt, and apache, php installed
+
++37 the mighty hub, using docker hub registry images++
+hub.docker.com
+
+official vs good images vs bad images
+download images and image tags
+
+docker pull nginx:1.11  (the tag here is the version)
+
+++38 images and their layers: Discover the Image Cache++
+
+history and inspect commands
+copy on write concept
+image layers
+union file system
+
+history and layers:
+$docker history nginx:latest
+WARNING: Error loading config file: /home/avwong13/.docker/config.json: stat /home/avwong13/.docker/config.json: permission denied
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+2bcb04bdb83f        10 days ago         /bin/sh -c #(nop)  CMD ["nginx" "-g" "daemon…   0B
+<missing>           10 days ago         /bin/sh -c #(nop)  STOPSIGNAL SIGTERM           0B
+<missing>           10 days ago         /bin/sh -c #(nop)  EXPOSE 80                    0B
+
+--container layer
+lets say you have an apache image and you run container 1 and container 2
+of that image and you make a change in container 2 then in terms of file space
+will on show the differences between the image base and whats happening in the
+containers
+
+copy on write - copy and write is when the we make a change in a file in a container, then the
+file system takes a copy of that file  from the base and writes a copy
+into that container
+
+inspect gives you back the metadata
+
+ExposedPorts tells you what ports to open to access it
+
+each layer is uniquely identified and only stored once on a host
+
+++39 image tagging and pushing to docker hub++
+
+tagging
+
+$docker image tag
+
+tag is not exactly version, but its more like a pointer
+to that commit
+
+how to tag images:
+$ sudo docker image tag --help
+
+Usage:	docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+how to push to dockerhub:
+sudo docker image ls
+REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
+api                  latest              e9b9008933c3        4 days ago          794MB
+$sudo docker login
+$sudo docker image push <repository>
+
+++Building Images: The Dockerfile Basics++
+
+Dockerfile syntax
+```
+From <another image>
+#all images must have a FROM
+#usually from a minimal linux distro like debian or alpine
+
+ENV NGINX_VERSION 1.11.10-1-jessie
+# optional environment variable thats used in later lines and set as envvar when
+#container is running
+
+RUN <commands>
+RUN <more commands and so on>
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf dev/stderr /var/log/nginx/error.log
+#foward request and error logs to docker log collector
+
+EXPOSE
+#expose these ports on the docker virtual network
+#you still need to use -p or -P to open/forward these ports on host
+
+CMD ["nginx", "-g", "daemon off;"]
+#required: run this command when container is launged
+#only one cmd allowed, so if there are multiple, last one wins
+
+```
+
+++41 Building Images: Running Docker Builds++
+have a Dockerfile
+build docker file in your current directory:
+$docker image build -t <tag name> .
+
+++42 Building Images: Extending Official Images
