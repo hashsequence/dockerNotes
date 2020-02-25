@@ -457,7 +457,7 @@ solution:
  
 ```
 
-## 36 What's In An Image (and What Isn't)
+## 35 What's In An Image (and What Isn't)
 
 whats an image:
 
@@ -467,7 +467,7 @@ whats an image:
 * small as one file like a golang static binary
 * big as ubuntu distro with apt, and apache, php installed
  
-## 37 the mighty hub, using docker hub registry images
+## 36 the mighty hub, using docker hub registry images
 
 hub.docker.com
 
@@ -476,4 +476,123 @@ download images and image tags
 
 ```console
 docker pull nginx:1.11  (the tag here is the version)
+```
+
+## 37 images and their layers: Discover the Image Cache
+
+* history and inspect commands
+* copy on write concept
+* image layers
+* union file system
+
+history and layers
+
+```console
+$ docker history nginx:latest
+WARNING: Error loading config file: /home/avwong13/.docker/config.json: stat /home/avwong13/.docker/config.json: permission denied
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+2bcb04bdb83f        10 days ago         /bin/sh -c #(nop)  CMD ["nginx" "-g" "daemon…   0B
+<missing>           10 days ago         /bin/sh -c #(nop)  STOPSIGNAL SIGTERM           0B
+<missing>           10 days ago         /bin/sh -c #(nop)  EXPOSE 80                    0B
+```
+* container layer
+    * lets say you have an apache image and you run container 1 and container 2 of that image and you make a change in container 2 then in terms of file space will on show the differences between the image base and whats happening in the containers
+
+* copy on write : copy and write is when the we make a change in a file in a container then the file system takes a copy of that file  from the base and writes a copy into that container
+
+
+* inspect gives you back the metadata
+
+* ExposedPorts tells you what ports to open to access it
+
+* each layer is uniquely identified and only stored once on a host
+
+## 38 image tagging and pushing to docker hub
+
+tagging:
+
+```console
+$docker image tag
+```
+
+tag is not exactly version, but its more like a pointer to that commit
+
+
+how to tag images:
+
+
+```console
+$ sudo docker image tag --help
+
+Usage:	docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+```
+
+how to push to dockerhub:
+
+
+```console
+$ sudo docker image ls
+REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
+api                  latest              e9b9008933c3        4 days ago          794MB
+$ sudo docker login
+$ sudo docker image push <repository>
+```
+
+## 39 Building Images: The Dockerfile Basics
+
+Dockerfile syntax
+```dockerfile
+From <another image>
+#all images must have a FROM
+#usually from a minimal linux distro like debian or alpine
+
+ENV NGINX_VERSION 1.11.10-1-jessie
+# optional environment variable thats used in later lines and set as envvar when
+#container is running
+
+RUN <commands>
+RUN <more commands and so on>
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf dev/stderr /var/log/nginx/error.log
+#foward request and error logs to docker log collector
+
+EXPOSE
+#expose these ports on the docker virtual network
+#you still need to use -p or -P to open/forward these ports on host
+
+CMD ["nginx", "-g", "daemon off;"]
+#required: run this command when container is launged
+#only one cmd allowed, so if there are multiple, last one wins
+
+```
+
+## 40 Building Images: Running Docker Builds
+
+have a Dockerfile
+build docker file in your current directory:
+
+
+```console
+$docker image build -t <tag name> .
+```
+
+## 41 Building Images: Extending Official Images
+
+dockerfile
+```dockerfile
+  FROM nginx:latest
+  #highly reccommend you always pin version for anything beyond dev/learn
+  WORKDIR /usr/share/nginx/html
+  #change working directory to root of nginx webhost
+  #using WORKDIR is prefered to using RUN cd /some/path
+
+  COPY index.html index.html
+  #missing CMD because there is already a CMD in the FROM image
+
+```
+
+```console
+$ docker image build -t nginx-custom
 ```
