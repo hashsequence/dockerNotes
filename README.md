@@ -134,3 +134,73 @@ avwong13 32308  0.0  0.0  14224   960 pts/4    S+   18:12   0:00 grep --color=au
 
 ## 24 Managing Multiple Containers
 
+### assignment 
+
+* docs.docker.com and --help
+* run a nginx, mysql, httpd
+* run all of them --detach(or -d), name them with --name
+* nginx should listen on 80:80, httpd on 8080:80, mysql on 3306:3306
+* when running mysql, use the --env(or -e) to pass in MYSQL_RANDOM_ROOT_PASSWORD=yes
+* use docker container logs on mysql to find the random MYSQL_RANDOM_ROOT_PASSWORD
+* clean it all up with docker container stop and docker container rm   (both can acceptmultiple names or ID's)
+* use docker container ls to check
+
+
+### solution
+
+```console
+$ sudo docker container run --publish 80:80 --detach --name c1 nginx
+$ sudo docker container run --publish 8080:80 --detach --name c2 httpd
+$ sudo docker container run -d -p 3306:3306 --name c3 -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+$ sudo docker container logs c3 | grep PASSWORD
+
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES
+b11df1035d6d        mysql               "docker-entrypoint.s…"   4 minutes ago       Up 3 minutes        0.0.0.0:3306->3306/tcp, 33060/tcp   c3
+eff5ef3783e3        httpd               "httpd-foreground"       15 minutes ago      Up 15 minutes       0.0.0.0:8080->80/tcp                c2
+bf632191458d        nginx               "nginx -g 'daemon of…"   17 minutes ago      Up 17 minutes       0.0.0.0:80->80/tcp                  c1
+
+$ curl localhost:8080
+<html><body><h1>It works!</h1></body></html>
+
+```
+
+cleaning up 
+
+```console
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS     
+
+$ sudo docker container ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS 
+
+$ sudo docker container ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                         PORTS               NAMES
+b11df1035d6d        mysql               "docker-entrypoint.s…"   6 minutes ago       Exited (0) 34 seconds ago                          c3
+eff5ef3783e3        httpd               "httpd-foreground"       17 minutes ago      Exited (0) 36 seconds ago                          c2
+bf632191458d        nginx               "nginx -g 'daemon of…"   19 minutes ago      Exited (0) 36 seconds ago                          c1
+1733fc79806e        mongo               "docker-entrypoint.s…"   37 minutes ago      Exited (0) 31 minutes ago                          mongo
+22f59b3f689b        nginx               "nginx -g 'daemon of…"   About an hour ago   Created                                            webhost
+ad1df56e92df        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       suspicious_nightingale
+6369fb6bebf2        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       determined_elion
+4eab28f4ac02        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       wonderful_varahamihira
+3cf841f5841d        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       brave_hugle
+d1e085e5ccb9        hello-world         "/hello"                 19 hours ago        Exited (0) 19 hours ago                            suspicious_roentgen
+
+$ sudo docker rm b11 eff bf6
+b11
+eff
+bf6
+
+$ sudo docker container ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                         PORTS               NAMES
+1733fc79806e        mongo               "docker-entrypoint.s…"   37 minutes ago      Exited (0) 31 minutes ago                          mongo
+22f59b3f689b        nginx               "nginx -g 'daemon of…"   About an hour ago   Created                                            webhost
+ad1df56e92df        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       suspicious_nightingale
+6369fb6bebf2        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       determined_elion
+4eab28f4ac02        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       wonderful_varahamihira
+3cf841f5841d        nginx               "nginx -g 'daemon of…"   About an hour ago   Exited (0) About an hour ago                       brave_hugle
+d1e085e5ccb9        hello-world         "/hello"                 19 hours ago        Exited (0) 19 hours ago                            suspicious_roentgen
+```
+
+## 26 Whats Going On in Containers: CLI Process Monitering
