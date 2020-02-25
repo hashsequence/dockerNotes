@@ -732,3 +732,5 @@ containers. Examples include:
 * docker image prune to clean up just "dangling" images
 * docker system prune will clean up everything
 * The big one is usually docker image prune -a which will remove all images you're not using. Use docker system df to see space usage.
+
+# 45 container lifetime &  Persistant Data
