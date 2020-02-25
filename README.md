@@ -9,12 +9,12 @@
 
 gives us info on our docker:
 ```console
-docker info
+$ docker info
 ```
 
 this is the new way to run docker container (old way is $docker run)
 ```console
-docker container run
+$ docker container run
 ```
 
 ### image vs Container
@@ -95,7 +95,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 take this command:
 
 ```console
-docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
+$ docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
 ```
 * 1.11 --> change version of IMAGE
 * -T --> change CMD run on start
