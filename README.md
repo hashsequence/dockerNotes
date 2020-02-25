@@ -83,3 +83,24 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ```
 
 ## 21 Debrief: What Happens When We Run a Container
+
+1. looks for the image locally in image cache
+2. looks in remote image repository (dockerhub)
+3. downloads latest version
+4. creates a new container based on that image and prepares to start
+5. gives it a vertual ip on a private network inside the docker engine
+6. opens up port 80 on host and forwards to port 80 in containers
+7. start container by using the CMD in the image Dockerfile
+
+take this command:
+
+```bash
+docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
+```
+* 1.11 --> change version of IMAGE
+* -T --> change CMD run on start
+* 8080:80 --> change host listening port
+
+
+## 22 container vs. VM: Its the process
+
