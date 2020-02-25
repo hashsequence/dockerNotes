@@ -734,3 +734,15 @@ containers. Examples include:
 * The big one is usually docker image prune -a which will remove all images you're not using. Use docker system df to see space usage.
 
 # 45 container lifetime &  Persistant Data
+
+* containers are usually immutable and ephemeral (temporary, throwable, etc)
+* idea of "immutable infrastructure": only re-deploy containers, never change
+* this is the ideal scenario, but what about databases, or unique data?
+* docker gives us features to ensure these "seperation of concerns"
+* this is known a "persistant",
+* two ways: volumes and bind mounts
+* volumes: make special location outside of container ufs
+* bind mounts: link container path to host path (coming from host)
+
+# 46 Persistant Data: Data Volumes
+
