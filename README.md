@@ -271,4 +271,92 @@ as soon as traffic comes into 8080 it will route into httpd, the httpd is free t
 you cant have more than one container listening on same port
 
 
-## 30 Docker Networks: CLI Management of virtual Networks
+## 29 Docker Networks: CLI Management of virtual Networks
+
+* show networks
+
+```console
+$ docker network ls
+```
+
+* docker network inspect
+
+```console
+$ inspect a network
+```
+
+* create network
+
+```console
+$ docker network create --driver
+```
+
+* attach a network to container
+
+```console
+$ docker network connect
+```
+
+* detach a network from container
+
+```console
+$ docker network disconnect
+```
+
+example:
+
+```console
+
+$ sudo docker network create my_app_net
+43ff195809b0a76ca326c7581b91f76d0fff4d0a4611caf309adc1ebb4f98b13
+$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+1b7f0aad50a8        bridge              bridge              local
+e0c703b821cd        host                host                local
+43ff195809b0        my_app_net          bridge              local
+bd6a5a434f32        none                null                local
+
+```
+
+run this below to start container in your new network:
+
+
+```console
+$ sudo docker container run -d --name new_nginx --network my_app_net nginx
+2109f3c42a36673d6ea2dc58bc1e484e485e42bab0213a7b88a5fad461351cb4
+```
+
+* connect my_app_net to the webhost:
+
+
+```console
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                 NAMES
+2109f3c42a36        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   80/tcp                new_nginx
+e28a17ea86a1        nginx               "nginx -g 'daemon of…"   17 minutes ago       Up 17 minutes       0.0.0.0:80->80/tcp    webhost
+5e56ba83a0a4        mysql               "docker-entrypoint.s…"   6 hours ago          Up 6 hours          3306/tcp, 33060/tcp   mysql
+a089cae98cce        nginx               "nginx -g 'daemon of…"   6 hours ago          Up 6 hours          80/tcp                nginx
+$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+1b7f0aad50a8        bridge              bridge              local
+e0c703b821cd        host                host                local
+43ff195809b0        my_app_net          bridge              local
+bd6a5a434f32        none                null                local
+$  docker network connect 43ff195 e28a17
+
+```
+
+* now inspect webhost and go to Networks properties to see what its connected to
+
+```console
+$ sudo docker container inspect e28a17
+```
+
+*disconnection container from network
+
+```console
+$ sudo docker network disconnect 43ff195 e28a17
+
+```
+
+## 31 Docker Networks: DNS and how containers find each other
