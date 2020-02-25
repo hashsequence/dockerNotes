@@ -104,3 +104,33 @@ docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
 
 ## 22 container vs. VM: Its the process
 
+```console
+$ sudo docker run --name mongo -d mongo
+$ sudo docker top mongo
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+999                 31821               31800               1                   18:07               ?                   00:00:01            mongod --bind_ip_all
+ps
+  PID TTY          TIME CMD
+26896 pts/4    00:00:00 bash
+32007 pts/4    00:00:00 ps
+$ sudo docker stop mongo
+sudo docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS     
+$ ps aux | grep mongo
+avwong13 32138  0.0  0.0  14224   968 pts/4    S+   18:11   0:00 grep --color=auto mongo
+```
+
+* this command looks for process with mongo
+* lets now below start mongo again and use ps aux
+
+```console
+$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+1733fc79806e        mongo               "docker-entrypoint.s…"   5 minutes ago       Up 3 seconds        27017/tcp           mongo
+$ ps aux | grep mongo
+999      32200 13.3  0.9 1095764 75832 ?       Ssl  18:12   0:01 mongod --bind_ip_all
+avwong13 32308  0.0  0.0  14224   960 pts/4    S+   18:12   0:00 grep --color=auto mongo
+```
+
+## 24 Managing Multiple Containers
+
