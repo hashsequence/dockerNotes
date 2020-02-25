@@ -213,3 +213,62 @@ d1e085e5ccb9        hello-world         "/hello"                 19 hours ago   
 ```
 
 ## 26 Whats Going On in Containers: CLI Process Monitering
+
+* gives me a json array of details of this container:
+```console
+$ sudo docker container inspect mysql
+```
+*gives me details on running container
+
+```console
+$ sudo docker container stats mysql
+
+```
+
+## 27 Getting a Shell Inside Containers
+
+* start new container interactively
+
+```console
+$ docker container run -it
+```
+
+* run additional comand in existing container
+
+```console
+$ docker container exec -it
+```
+
+* run ubuntu container
+
+```console
+$ sudo docker container run -it --name ubuntu ubuntu
+```
+
+## 28 Docker Networks: Concepts for Private and Public Comms
+
+```console
+docker container run -p
+```
+
+* for local dev/testing network usualy "just work"
+* quick port check with docker container port <container>
+* understand how dockers talk to each other
+* each container connected to private virtual network "bridge"
+* all containers on a virt net can talk to each other without -p
+* best practice is to create a new virt net for each App
+* make new virtual networks
+
+unless I specify the -p no networks coming to my network is actually getting into my container.
+
+
+lets say we have a mysql container without -p  and we have a httpd with -p 8080:80
+
+
+as soon as traffic comes into 8080 it will route into httpd, the httpd is free to talk to the mysql container via listening port
+
+
+you cant have more than one container listening on same port
+
+
+## 30 Docker Networks: CLI Management of virtual Networks
