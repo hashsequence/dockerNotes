@@ -360,3 +360,120 @@ $ sudo docker network disconnect 43ff195 e28a17
 ```
 
 ## 31 Docker Networks: DNS and how containers find each other
+
+* forget static ip's as a way for containers to see each other, because its too dynamic
+* docker has dns naming
+* detached mode, shown by the option --detach or -d, means that a docker container runs in the background of your terminal.
+* Docker has DNS naming
+* Detached mode, shown by the option --detach or -d, means that a Docker container
+runs in the background of your terminal.
+
+lets have my_nginx pinging new_nginx:
+
+```console
+$ sudo docker container run -it -d --name new_nginx --network my_app_net nginx:alpine
+3fc886d83c50199cb53a4397016317e55bf16e797e1157f24051dcac36f89851
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
+3fc886d83c50        nginx:alpine        "nginx -g 'daemon of…"   About a minute ago   Up About a minute   80/tcp               new_nginx
+b80070fdd01b        nginx:alpine        "nginx -g 'daemon of…"   7 minutes ago        Up 7 minutes        80/tcp               my_nginx
+4d460300cfa1        nginx               "nginx -g 'daemon of…"   20 minutes ago       Up 20 minutes       0.0.0.0:80->80/tcp   webhost
+$ sudo docker container exec -it new_nginx ping my_nginx
+PING my_nginx (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.394 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.220 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.217 ms
+64 bytes from 172.18.0.2: seq=3 ttl=64 time=0.185 ms
+64 bytes from 172.18.0.2: seq=4 ttl=64 time=0.243 ms
+64 bytes from 172.18.0.2: seq=5 ttl=64 time=0.235 ms
+64 bytes from 172.18.0.2: seq=6 ttl=64 time=0.216 ms
+```
+
+--- my_nginx ping statistics ---
+7 packets transmitted, 7 packets received, 0% packet loss
+round-trip min/avg/max = 0.185/0.244/0.394 ms
+
+
+* host name will always be the same
+* link defines link between containers
+* compose will automatically spin up virtual network
+
+## 32 Assignment: Using Containers for CLI Testing
+
+* use different linux distro containers to  check curl cli tool version
+
+* use two different terminal windows to start bash in centos:7 and ubuntu 14.04 using -it 
+
+* ensure curl is up to date on both distro
+
+* ensure curl is up to date on both distro
+
+* centos : yum update curls 
+
+* check curl --version
+
+
+solution:
+
+on ubuntu: 
+
+```console
+$ sudo docker container run -it -d --name ubuntu ubuntu:14.04
+$ sudo docker container exec -it ubuntu bash
+
+```
+
+
+centos:
+
+```console
+$ sudo docker container run -it -d --name centos centos:7
+$ sudo docker container exec -it centos bash
+[root@7fae1027116f /]# yum update curls
+```
+
+## 34 Assignment: DNS Round Robin Test
+
+* know how to use -it to get shell in container
+* know how to run a container
+* understand basics of dns
+* dns round robin test is two different hosts with dns alias that responds to the same dns name, for example google.com have multiple dns records.
+* create a virtual network (default bridege driver)
+* create two containes from elasticsearch:2
+* use --network-alias search when creating them to give them an additional dns name to respond to
+* run alpine nslookup search with --net to see the two containers list for the same DNS name
+* run centos curl -s search:9200 with --net multiple times until you see both "name" fields show
+*  If instead you’d like Docker to automatically clean up the container and remove the file system when the container exits, you can add the --rm flag
+
+
+solution:
+
+
+```console
+ $ sudo docker container run -it -d --name el2 --network my_app_net --alias-net search elasticsearch:2
+ $ sudo docker container run -it -d --name el2 --network my_app_net --alias-net search elasticsearch:2
+ $ sudo docker container run --rm --net my_app_net  alpine nslookup search alpine nslookup search
+ $ sudo docker container run --net my_app_net centos curl -s search:9200
+ 
+```
+
+## 36 What's In An Image (and What Isn't)
+
+whats an image:
+
+* app binaries and dependencies
+* metadata about image data nd how to run image
+* not a complete OS, no kernel (eg no drivers)
+* small as one file like a golang static binary
+* big as ubuntu distro with apt, and apache, php installed
+ 
+## 37 the mighty hub, using docker hub registry images
+
+hub.docker.com
+
+official vs good images vs bad images
+download images and image tags
+
+```console
+docker pull nginx:1.11  (the tag here is the version)
+```
