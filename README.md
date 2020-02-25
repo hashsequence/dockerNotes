@@ -105,7 +105,8 @@ $ docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
      docker run --restart always --name myjenkins -p 8080:8080
      ```
      8080:80 refers that in the container you are using port 80 and you are forwarding that port to host machine's 8080 port. So you are running Jenkins on port 80 inside your container wherever in scenario 2 you are running Jenkins on port 8080 inside the container and exposing it over the same port on host machine. For example if I am running mysql in container I may use 8080:3306 so mysql would be running on port 3306 but exposed on 8080 of host machine but if choose it to be 8080:80 for mysql it may not work because as per the code of mysql it binds itself on port 3306 not port 80. Same is the scenario in your case of Jenkins too.
-     * tldr: Port for Outside World: Actual Port of service in container
+     * When you say 8080:80, it means any request coming on port 8080 will be forwarded to service running on port 80 inside your docker container. Similarly 8080:8080 means any request coming for port 8080 will be forwarded to service running on port 8080 inside your container. tldr: Port for Outside World: Actual Port of service in container
+     * https://stackoverflow.com/questions/52173352/what-is-the-difference-between-publishing-808080-and-80808080-in-a-docker-run
      
 
 
