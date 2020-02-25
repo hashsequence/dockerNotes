@@ -8,12 +8,12 @@
 
 
 gives us info on our docker:
-```bash
+```console
 docker info
 ```
 
 this is the new way to run docker container (old way is $docker run)
-```bash
+```console
 docker container run
 ```
 
@@ -27,7 +27,7 @@ docker container run
     * start a new container of that image
     * opens the local host
 
-```bash
+```console
 $ sudo docker container run --publish 80:80 --detach nginx
 $ sudo docker container ls
 $ sudo docker container ls
@@ -48,7 +48,7 @@ $ docker container stop ad1
 * then run the stop command with the processid (only need the first few digits for it to be unique)
 
 
-```bash
+```console
 $ sudo docker container run --publish 80:80 --detach --name webhost2 nginx
 950d1cf9403ba3eb440b29c7bc636f28ede2c356214259169e5faa2fd28d6226
 $ sudo docker container logs webhost2
@@ -59,7 +59,7 @@ $ sudo docker container logs webhost2
 
 Display the running processes of a container:
 
-```bash
+```console
 $ sudo docker container top
 "docker container top" requires at least 1 argument.
 See 'docker container top --help'.
@@ -73,7 +73,7 @@ Usage:  docker container top CONTAINER [ps OPTIONS]
 removing the docker container webhost2
 
 
-```bash 
+```console 
 $ sudo docker container ls
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
 950d1cf9403b        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp   webhost2
@@ -94,7 +94,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 
 take this command:
 
-```bash
+```console
 docker container run --publish 8080:80 --name webhost -d nginx:1.11 nginx -T
 ```
 * 1.11 --> change version of IMAGE
@@ -111,7 +111,7 @@ UID                 PID                 PPID                C                   
 999                 31821               31800               1                   18:07               ?                   00:00:01            mongod --bind_ip_all
 ps
   PID TTY          TIME CMD
-26896 pts/4    00:00:00 bash
+26896 pts/4    00:00:00 console
 32007 pts/4    00:00:00 ps
 $ sudo docker stop mongo
 sudo docker ps
