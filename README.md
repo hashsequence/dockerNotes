@@ -1,7 +1,7 @@
 
 # Docker Notes
 
-## Checking our Docker install and config
+## 19 Checking our Docker install and config
 
 * Nginx (web server) container
     * makes it easy to learn docker stuff
@@ -28,12 +28,12 @@ docker container run
     * opens the local host
 
 ```bash
-sudo docker container run --publish 80:80 --detach nginx
-sudo docker container ls
-sudo docker container ls
+$ sudo docker container run --publish 80:80 --detach nginx
+$ sudo docker container ls
+$ sudo docker container ls
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
 ad1df56e92df        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp   suspicious_nightingale
-sudo docker container ls -a
+$ sudo docker container ls -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS                     PORTS                NAMES
 22f59b3f689b        nginx               "nginx -g 'daemon of…"   About a minute ago   Created                                         webhost
 ad1df56e92df        nginx               "nginx -g 'daemon of…"   2 minutes ago        Up 2 minutes               0.0.0.0:80->80/tcp   suspicious_nightingale
@@ -46,3 +46,43 @@ $ docker container stop ad1
 
 * if you want to stop the docker use docker container ls to see you process id
 * then run the stop command with the processid (only need the first few digits for it to be unique)
+
+
+```bash
+$ sudo docker container run --publish 80:80 --detach --name webhost2 nginx
+950d1cf9403ba3eb440b29c7bc636f28ede2c356214259169e5faa2fd28d6226
+$ sudo docker container logs webhost2
+172.17.0.1 - - [01/Apr/2019:00:57:48 +0000] "HEAD / HTTP/1.1" 200 0 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36" "-"
+172.17.0.1 - - [01/Apr/2019:00:57:48 +0000] "HEAD / HTTP/1.1" 200 0 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36" "-"
+```
+
+
+Display the running processes of a container:
+
+```bash
+$ sudo docker container top
+"docker container top" requires at least 1 argument.
+See 'docker container top --help'.
+
+Usage:  docker container top CONTAINER [ps OPTIONS]
+
+```
+
+### this is to show running docker containers
+
+removing the docker container webhost2
+
+
+```bash 
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
+950d1cf9403b        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp   webhost2
+$ docker container rm -f 950
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Delete http://%2Fvar%2Frun%2Fdocker.sock/v1.39/containers/950?force=1: dial unix /var/run/docker.sock: connect: permission denied
+$ sudo docker container rm -f 950
+950
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS     
+```
+
+## 21 Debrief: What Happens When We Run a Container
