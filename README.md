@@ -633,6 +633,7 @@ my directory:
 
 
 ```
+
 ```dockerfile
 # use this empty Dockerfile to build your assignment
 
@@ -695,8 +696,8 @@ $ docker build -t testnode .
 
 run it and remove container after 
 
-````console
-$ docker container run --rm -p 80:8080 testnode
+```console
+$ docker container run --rm -p 80:3000 testnode
 ```
 
 now go to localhost on browser
@@ -718,7 +719,7 @@ $ docker image rm whatever/testing-node
 now run the container (it will find it on dockerhub)
 
 ```console
-docker container run --rm -p 80:3000 whatever/testing-node
+$ docker container run --rm -p 80:3000 whatever/testing-node
 ```
 
 note: 
