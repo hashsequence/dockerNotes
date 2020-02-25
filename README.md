@@ -77,10 +77,7 @@ removing the docker container webhost2
 $ sudo docker container ls
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
 950d1cf9403b        nginx               "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp   webhost2
-$ docker container rm -f 950
-Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Delete http://%2Fvar%2Frun%2Fdocker.sock/v1.39/containers/950?force=1: dial unix /var/run/docker.sock: connect: permission denied
 $ sudo docker container rm -f 950
-950
 $ sudo docker container ls
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS     
 ```
