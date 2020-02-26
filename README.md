@@ -907,4 +907,193 @@ the index html will be different
 * create an new postgres container with same name volume using 9.6.2
 * check logs to validate
 
-##50 Answer: database upgrade with named volumes
+## 50 Answer: database upgrade with named volumes
+
+```console
+$ sudo docker container run --name psql -d -v psql:/var/lib/postgres/data postgres:9.6.1
+Unable to find image 'postgres:9.6.1' locally
+9.6.1: Pulling from library/postgres
+5040bd298390: Pull complete 
+f08454c3c700: Pull complete 
+4db038cdfe03: Pull complete 
+e1d9ba315f03: Pull complete 
+25e0ee93170e: Pull complete 
+3f28084c3f51: Pull complete 
+78c91f0aedcd: Pull complete 
+93ab52dbcbb8: Pull complete 
+27ec75825613: Pull complete 
+28ef691a9920: Pull complete 
+0f0dd20755c9: Pull complete 
+2a4a824861f7: Pull complete 
+Digest: sha256:0842a7ef786aa2658623085160cb38451eb3d40856e7d222ae0069b6e6296877
+Status: Downloaded newer image for postgres:9.6.1
+6a93c0523525348d3894343f452708c369193e8c64afe0d7261e098d2410823d
+avwong13@avwong13:~/dockerNotes$ sudo docker container logs -f psql
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting dynamic shared memory implementation ... posix
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+
+WARNING: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+****************************************************
+WARNING: No password has been set for the database.
+         This will allow anyone with access to the
+         Postgres port to access your database. In
+         Docker's default configuration, this is
+         effectively any other container on the same
+         system.
+
+         Use "-e POSTGRES_PASSWORD=password" to set
+         it in "docker run".
+****************************************************
+waiting for server to start....LOG:  could not bind IPv6 socket: Cannot assign requested address
+HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+LOG:  database system was shut down at 2020-02-26 08:58:00 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ done
+server started
+ALTER ROLE
+
+
+/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+waiting for server to shut down...LOG:  autovacuum launcher shutting down
+.LOG:  shutting down
+LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+LOG:  database system was shut down at 2020-02-26 08:58:02 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+
+
+^C
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+6a93c0523525        postgres:9.6.1      "/docker-entrypoint.…"   4 minutes ago       Up 4 minutes        5432/tcp            psql
+$ sudo docker container stop 6a93
+6a93
+$ sudo docker container run --name psql2 -d -v psql:/var/lib/postgres/data postgres:9.6.2
+Unable to find image 'postgres:9.6.2' locally
+9.6.2: Pulling from library/postgres
+10a267c67f42: Pull complete 
+e9a920522e33: Pull complete 
+6888e696bd71: Pull complete 
+798096eed143: Pull complete 
+fb58419959b5: Pull complete 
+97f9ec09cb68: Pull complete 
+d58678d9d3ab: Pull complete 
+ece2bc4a78f4: Pull complete 
+eadac36b8440: Pull complete 
+4da13987a6ca: Pull complete 
+bd2eab93fc5a: Pull complete 
+2efd8a94a8d7: Pull complete 
+cd1f07c4ebbe: Pull complete 
+Digest: sha256:5284ba74a1065e34cf1bfccd64caf8c497c8dc623d6207b060b5ebd369427d34
+Status: Downloaded newer image for postgres:9.6.2
+7675d3802cd714303bda47c3939fca8b7367bcb3190d350adb94680f61c6dd8f
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+7675d3802cd7        postgres:9.6.2      "docker-entrypoint.s…"   7 seconds ago       Up 5 seconds        5432/tcp            psql2
+$ sudo docker container ls -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS               NAMES
+7675d3802cd7        postgres:9.6.2      "docker-entrypoint.s…"   19 seconds ago      Up 17 seconds               5432/tcp            psql2
+6a93c0523525        postgres:9.6.1      "/docker-entrypoint.…"   6 minutes ago       Exited (0) 57 seconds ago                       psql
+$ sudo docker container logs 7675
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/data ... ok
+creating subdirectories ... ok
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting dynamic shared memory implementation ... posix
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+WARNING: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/data -l logfile start
+
+****************************************************
+WARNING: No password has been set for the database.
+         This will allow anyone with access to the
+         Postgres port to access your database. In
+         Docker's default configuration, this is
+         effectively any other container on the same
+         system.
+
+         Use "-e POSTGRES_PASSWORD=password" to set
+         it in "docker run".
+****************************************************
+waiting for server to start....LOG:  could not bind IPv6 socket: Cannot assign requested address
+HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+LOG:  database system was shut down at 2020-02-26 09:03:45 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ done
+server started
+ALTER ROLE
+
+
+/usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+LOG:  received fast shutdown request
+waiting for server to shut down...LOG:  aborting any active transactions
+.LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
+
+LOG:  database system was shut down at 2020-02-26 09:03:47 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+```
+
+## 51 Assignment: Edit Code Running in Containers With Bind Mounts
