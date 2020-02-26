@@ -1097,3 +1097,20 @@ LOG:  autovacuum launcher started
 ```
 
 ## 51 Assignment: Edit Code Running in Containers With Bind Mounts
+
+* excercise is to show what it looks like to mount data from the host
+computer to docker and changing it and see how it looks in the containers
+* bind mounts is good for testing
+
+## 52 Solution:  Edit Code Running in Containers With Bind Mounts
+
+I edited an html and I run the container
+```console
+$ sudo docker run -p 80:4000 -v $(pwd):/site bretfisher/jekyll-serve
+
+```
+
+takeaway is ...run -v /host/path:/path/container (unix)
+I bind(map) the path in the localhost to the containers path
+
+# Docker Compose : The Multi-Container Tool
