@@ -746,3 +746,165 @@ containers. Examples include:
 
 # 46 Persistant Data: Data Volumes
 
+* VOLUME command in DockerFile
+* official repository have better designed dockerfiles, so look for reference
+* example:
+```dockerfile
+VOLUME var/lib/usr
+```
+
+volume will outlive container, and you must use 
+docker image prune to delete volume
+
+```console
+$ docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=True mysql
+Unable to find image 'mysql:latest' locally
+latest: Pulling from library/mysql
+619014d83c02: Pull complete 
+9ced578c3a5f: Pull complete 
+731f6e13d8ea: Pull complete 
+3c183de42679: Pull complete 
+6de69b5c2f3c: Pull complete 
+122a561a4196: Pull complete 
+1abf8e9f34f0: Pull complete 
+1e5887414166: Pull complete 
+95adaca07078: Pull complete 
+42c8c6542347: Pull complete 
+0ae93d9077ae: Pull complete 
+42131d6ef54e: Pull complete 
+Digest: sha256:c7c6c5beb312fd2eb21af4f144d14b6ef29c9c2f9c5e1f3f74ffa75e38fad1f4
+Status: Downloaded newer image for mysql:latest
+0f6f5d680c09a26bf9c60d733347f39290f1a9289f860d17e3a0bbf2c2feaa3b
+$ docker image inspect mysql
+#etc
+"Mounts": [
+            {
+                "Type": "volume",
+                "Name": "7da18186e19556cd8403a0086684a404e511f28b00c900b6c45e93a31e8c4b2e",
+                "Source": "/var/lib/docker/volumes/7da18186e19556cd8403a0086684a404e511f28b00c900b6c45e93a31e8c4b2e/_data",
+                "Destination": "/var/lib/mysql",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+#etc
+"Volumes": {
+                "/var/lib/mysql": {}
+            },
+
+#etc
+
+```
+
+if you stop and remove the container, the volumes are still there
+
+```console
+$ sudo docker container stop mysql 
+mysql
+$ sudo docker container rm mysql 
+mysql
+$ sudo docker volume ls
+DRIVER              VOLUME NAME
+local               2c80cbe8e3545df1338708f4cca04388121b4cf92a0125ab30e860d1ecea0033
+
+
+```
+
+* we can make volume name be more friendly with -v option
+
+```console
+$ sudo docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=True -v mysql-db:/var/lib/mysql mysql
+$ sudo docker volume ls
+DRIVER              VOLUME NAME
+local               mysql-db
+$ sudo docker container inspect mysql:
+#etc
+ "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "mysql-db",
+                "Source": "/var/lib/docker/volumes/mysql-db/_data",
+                "Destination": "/var/lib/mysql",
+                "Driver": "local",
+                "Mode": "z",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+#etc
+
+```
+
+* we can make volume by using docker volume create
+
+note 
+
+## 47 shell differences
+```
+With Docker CLI, you can always use a full file path on any OS, but often you'll see me and others use a "parameter expansion" like $(pwd) which means "print working directory".
+
+Here's the important part. Each shell may do this differently, so here's a cheat sheet for which OS and Shell your using. I'll be using $(pwd) on a Mac, but yours may be different!
+
+This isn't a Docker thing, it's a Shell thing.
+
+For PowerShell use: ${pwd} 
+
+For cmd.exe "Command Prompt use: %cd%
+
+Linux/macOS bash, sh, zsh, and Windows Docker Toolbox Quickstart Terminal use: $(pwd) 
+
+Note, if you have spaces in your path, you'll usually need to quote the whole path in the docker command.
+```
+
+## 48 Persistant Data: Bind Mouting
+
+* Maps a host file or directory to a container file or directory
+* Basically just two locations pointing to the same file
+* Again, skips UFS, and host files overwrite any in container
+* Cant use in Dockerfile, must be at container run
+* ... run -v /whatever:/path/container (unix)
+* ... run -v //c/Whatever:/path/container (windows)
+
+example with nginx:
+
+```console
+$ sudo docker build -t nginxcustom .
+Sending build context to Docker daemon  3.072kB
+Step 1/3 : FROM nginx:latest
+ ---> 2073e0bcb60e
+Step 2/3 : WORKDIR /usr/share/nginx/html
+ ---> Using cache
+ ---> d02aed9ef0c1
+Step 3/3 : COPY index.html index.html
+ ---> Using cache
+ ---> 615513d4e007
+Successfully built 615513d4e007
+Successfully tagged nginxcustom:latest
+$ sudo docker container run -d --name nginx2 -p 8080:80 -v $(pwd):/user/share/nginx/html nginx
+62e8dd3f7fade603f845edd4b3b12057d138a9176c2d76bc331e6a4816092711
+$ sudo docker container run -d --name nginx2 -p 80:80 -v $(pwd):/user/share/nginx/html nginxcustom
+docker: Error response from daemon: Conflict. The container name "/nginx2" is already in use by container "62e8dd3f7fade603f845edd4b3b12057d138a9176c2d76bc331e6a4816092711". You have to remove (or rename) that container to be able to reuse that name.
+See 'docker run --help'.
+$ sudo docker container run -d --name nginx -p 80:80 -v $(pwd):/user/share/nginx/html nginxcustom
+b6b47fffa1be71ba6fae2f2251cc3a46129bca5287a14c74e1d367c0f5517460
+$ sudo docker container ls
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+b6b47fffa1be        nginxcustom         "nginx -g 'daemon of…"   6 seconds ago       Up 4 seconds        0.0.0.0:80->80/tcp     nginx
+62e8dd3f7fad        nginx               "nginx -g 'daemon of…"   22 seconds ago      Up 21 seconds       0.0.0.0:8080->80/tcp   nginx2
+
+```
+
+if you check the browser at localhost:80 and localhost:8080
+the index html will be different
+
+## 49 Assigment: database upgrade with named volumes
+
+* Database upgrade with containers
+* create postgres conta path and versions need to run it
+* check logs stop container
+* create an new postgres container with same name volume using 9.6.2
+* check logs to validate
+
+##50 Answer: database upgrade with named volumes
