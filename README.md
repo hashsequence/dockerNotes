@@ -1,6 +1,10 @@
 
 # Docker Notes
 
+## Links
+
+1) [cmd vs entrypoint](https://www.bmc.com/blogs/docker-cmd-vs-entrypoint/)
+
 ## 19 Checking our Docker install and config
 
 * Nginx (web server) container
